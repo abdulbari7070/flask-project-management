@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<legend class="border-bottom mb-4">{{project.title}}</legend>
+		<div class="card m-2">
+		  <div class="card-body">
+		  	<div class="row">
+		  		<div class="col-12">
+		  			<table class="table text-center">
+					  <thead class="thead-dark">
+					    <tr>
+					      <th scope="col">Title</th>
+					      <th scope="col">Description</th>
+					      <th scope="col">Manager</th>
+					      <th scope="col">Start Date</th>
+					      <th scope="col">End Date</th>
+					       	{% if project.manager.username == current_user.username %}
+					       	<th scope="col">More</th>
+		  					{% endif %}
+
+					    </tr>
+					  </thead>
+					  <tbody>
+					    <tr>
+					      <td scope="row">{{project.title}}</td>
+					      <td>{{project.description}}</td>
+					      <td>{{project.manager.username}}</td>
+					      <td>{{project.start_date.strftime('%d-%m-%Y')}}</td>
+					      <td>{{project.end_date.strftime('%d-%m-%Y')}}</td>
+					      	{% if project.manager.username == current_user.username %}
+				  				<td><a href="{{ url_for('update_project',project_id=project.id) }}" title="Edit" class="btn btn-outline-primary btn-sm m-1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+			  					<button type="button" title="Delete" class="btn btn-outline-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+			  					<a href="{{ url_for('add_task',project_id=project.id) }}" title="Add Task" class="btn btn-outline-success btn-sm m-1"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+				  				</div></td>
+		  					{% endif %}
+					    </tr>
+					  </tbody>
+					</table>
+		  		</div>
+		  	</div>
+		  </div>
+		</div>
+
+
+<legend class="border-bottom mb-4 mt-5">All Tasks</legend>
+{#
+<div class="container row mb-5">
+	{% for task in tasks %}
+	<div class="col-4">
+		<div class="card" style="width: 22rem;">
+			<div class="card-body">
+				<h5 class="card-title">{{task.task_name}}</h5>
+				<p class="small card-subtitle mb-2 text-muted">Added On <strong>{{task.date_added.strftime('%Y-%m-%d')}}</strong></p>
+				<p class="small card-subtitle mb-2 text-muted">Added By <strong>{{project.manager.username}}</strong></p>
+				<p class="card-text">{{task.task_details}}</p>
+				<div class="mt-1">
+				<p class="small card-text float-left"><strong>Start Date : </strong> {{task.start_date.strftime('%Y-%m-%d')}}</p>
+				<p class="small card-text float-right"><strong>End Date : </strong>{{task.end_date.strftime('%Y-%m-%d')}}</p>
+				</div>
+				<br><hr>	
+				<p class="small card-text float-right text-success"><strong> Status : </strong> {{task.status}}</p>
+				<a href="#" class="card-link">Edit</a>
+				<a href="#" class="card-link">Delete</a>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+#}
+
+	<table class="small table text-center">
+					  <thead class="thead-dark">
+					    <tr>
+					      <th>Task</th>
+					      <th>Details</th>
+					      <th>Manager</th>
+					      <th>Date Added</th>
+					      <th>Start Date</th>
+					      <th>End Date</th>
+					      <th>Status</th>
+					      <th>Developer</th>
+					
+					      <th>More</th>
+					
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	{% for task in tasks %}
+					    <tr>
+					      <td>{{task.task_name}}</td>
+					      <td>{{task.task_details}}</td>
+					      <td>{{project.manager.username}}</td>
+					      <td>{{task.date_added.strftime('%d-%m-%Y')}}</td>
+					      <td>{{task.start_date.strftime('%d-%m-%Y')}}</td>
+					      <td>{{task.end_date.strftime('%d-%m-%Y')}}</td>
+					       
+					      {% if task.status == 'not_started' %}
+							<td><p class="text-warning">Not Started</p></td>
+					      {% elif task.status == 'active' %}
+					      	<td><p class="text-info">Active</p></td>
+					      {% else %}
+					      		<td><p class="text-success">Completed</p></td>
+					      {% endif %}
+
+					      	
+					      <td>{{task.developer}}</td>
+
+					      	{% if project.manager.username == current_user.username or task.developer == current_user.username %}
+				  				<td><a href="{{ url_for('update_task',project_id=project.id,task_id=task.id) }}" title="Edit" class="btn btn-outline-primary btn-sm m-1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+
+				  			{% endif %}
+					    </tr>
+					    {% endfor %}
+					  </tbody>
+					</table>
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Project?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="{{ url_for('delete_project',project_id=project.id) }}" method="POST">
+        	<input type="submit" class="btn btn-danger" value="Delete">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
